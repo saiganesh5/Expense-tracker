@@ -35,13 +35,13 @@ const INLINE_PATTERNS: { re: RegExp; kind: InlineKind }[] = [
 function makeInline(kind: InlineKind, m: RegExpExecArray, key: number): ReactNode {
   switch (kind) {
     case 'code':
-      return <code key={key} className="md-code-inline">{m[1]}</code>;
+      return <code key={key} className="bg-white/10 text-violet-300 font-mono text-xs px-1.5 py-0.5 rounded border border-white/10">{m[1]}</code>;
     case 'link': {
       const href = safeHref(m[2]);
       const inner = parseInline(m[1]);
       if (!href) return <Fragment key={key}>{m[0]}</Fragment>;
       return (
-        <a key={key} className="md-link" href={href} title={m[3]} target="_blank" rel="noopener noreferrer">
+        <a key={key} className="text-violet-400 hover:text-violet-300 underline underline-offset-2 transition-colors" href={href} title={m[3]} target="_blank" rel="noopener noreferrer">
           {inner}
         </a>
       );
@@ -107,12 +107,12 @@ function isBlockStart(line: string): boolean {
 
 function heading(level: number, children: ReactNode[]): ReactNode {
   switch (level) {
-    case 1: return <h1 className="md-h">{children}</h1>;
-    case 2: return <h2 className="md-h">{children}</h2>;
-    case 3: return <h3 className="md-h">{children}</h3>;
-    case 4: return <h4 className="md-h">{children}</h4>;
-    case 5: return <h5 className="md-h">{children}</h5>;
-    default: return <h6 className="md-h">{children}</h6>;
+    case 1: return <h1 className="text-xl font-bold text-white mb-2 mt-3 pb-1 border-b border-white/10">{children}</h1>;
+    case 2: return <h2 className="text-lg font-bold text-white mb-2 mt-3 pb-1 border-b border-white/10">{children}</h2>;
+    case 3: return <h3 className="text-base font-semibold text-white mb-1.5 mt-2.5">{children}</h3>;
+    case 4: return <h4 className="text-sm font-semibold text-white/90 mb-1 mt-2">{children}</h4>;
+    case 5: return <h5 className="text-sm font-medium text-white/90 mb-1 mt-2">{children}</h5>;
+    default: return <h6 className="text-xs font-medium text-white/70 mb-1 mt-2">{children}</h6>;
   }
 }
 
@@ -138,7 +138,7 @@ function parseBlocks(src: string): ReactNode[] {
       while (i < lines.length && !/^```\s*$/.test(lines[i])) { code.push(lines[i]); i++; }
       i++; // consume closing fence (if present)
       push(
-        <pre className="md-pre">
+        <pre className="bg-black/50 border border-white/10 rounded-lg p-3 my-2.5 overflow-x-auto text-xs font-mono text-slate-200">
           <code className={lang ? `language-${lang}` : undefined}>{code.join('\n')}</code>
         </pre>
       );
@@ -154,7 +154,7 @@ function parseBlocks(src: string): ReactNode[] {
     }
 
     // Horizontal rule
-    if (HR_RE.test(line)) { push(<hr className="md-hr" />); i++; continue; }
+    if (HR_RE.test(line)) { push(<hr className="border-0 h-px bg-white/15 my-3" />); i++; continue; }
 
     // Blockquote (consecutive `>` lines, parsed recursively)
     if (QUOTE_RE.test(line)) {
@@ -163,7 +163,7 @@ function parseBlocks(src: string): ReactNode[] {
         quoted.push(lines[i].replace(QUOTE_RE, ''));
         i++;
       }
-      push(<blockquote className="md-quote">{parseBlocks(quoted.join('\n'))}</blockquote>);
+      push(<blockquote className="border-l-2 border-violet-500/60 pl-3 my-2 italic text-slate-300 text-sm">{parseBlocks(quoted.join('\n'))}</blockquote>);
       continue;
     }
 
@@ -176,10 +176,10 @@ function parseBlocks(src: string): ReactNode[] {
       while (i < lines.length) {
         const m = lines[i].match(itemRe);
         if (!m) break;
-        items.push(<li key={li++} className="md-li">{parseInline(m[2])}</li>);
+        items.push(<li key={li++} className="leading-relaxed">{parseInline(m[2])}</li>);
         i++;
       }
-      push(ordered ? <ol className="md-ol">{items}</ol> : <ul className="md-ul">{items}</ul>);
+      push(ordered ? <ol className="list-decimal list-inside my-2 space-y-1 text-slate-200 text-sm">{items}</ol> : <ul className="list-disc list-inside my-2 space-y-1 text-slate-200 text-sm">{items}</ul>);
       continue;
     }
 
@@ -198,7 +198,7 @@ function parseBlocks(src: string): ReactNode[] {
         nodes.push(hardBreak ? <br key={`br${idx}`} /> : <Fragment key={`sp${idx}`}> </Fragment>);
       }
     });
-    push(<p className="md-p">{nodes}</p>);
+    push(<p className="my-1.5 leading-relaxed text-sm text-slate-200">{nodes}</p>);
   }
 
   return blocks;
@@ -206,5 +206,5 @@ function parseBlocks(src: string): ReactNode[] {
 
 /** Render a Markdown string as safe, styled React output. */
 export function Markdown({ source }: { source: string }) {
-  return <div className="md">{parseBlocks(source ?? '')}</div>;
+  return <div className="text-sm text-slate-200 leading-relaxed break-words">{parseBlocks(source ?? '')}</div>;
 }

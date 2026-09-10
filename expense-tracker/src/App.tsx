@@ -1,5 +1,4 @@
 import { useState, type FormEvent } from 'react';
-import './App.css';
 import AuthPage from './AuthPage';
 import { getUser, isLoggedIn, logout, type StoredUser } from './authService';
 import { Markdown } from './markdown';
@@ -44,12 +43,12 @@ function columnTotal(rows: { cells: Record<string, CellValue> }[], columnId: str
 }
 
 const STAT_ACCENTS = [
-  'var(--accent-rose)',
-  'var(--accent-emerald)',
-  'var(--accent-amber)',
-  'var(--accent-orange)',
-  'var(--accent-cyan)',
-  'var(--accent-purple)',
+  '#f43f5e', // rose
+  '#10b981', // emerald
+  '#f59e0b', // amber
+  '#f97316', // orange
+  '#06b6d4', // cyan
+  '#a855f7', // purple
 ];
 
 /* =========================================
@@ -113,16 +112,16 @@ function Modal({
   wide?: boolean;
 }) {
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className={`modal ${wide ? 'modal-wide' : ''}`} onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>{title}</h2>
-          <button className="btn-icon" onClick={onClose} aria-label="Close modal">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in" onClick={onClose}>
+      <div className={`bg-[#121217] border border-white/10 rounded-2xl w-full ${wide ? 'max-w-2xl' : 'max-w-lg'} shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-scale-in`} onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/[0.02]">
+          <h2 className="text-base font-semibold text-white tracking-tight">{title}</h2>
+          <button className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer" onClick={onClose} aria-label="Close modal">
             {Icons.close}
           </button>
         </div>
-        <div className="modal-body">{children}</div>
-        {footer && <div className="modal-footer">{footer}</div>}
+        <div className="p-6 overflow-y-auto space-y-4">{children}</div>
+        {footer && <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/10 bg-white/[0.02]">{footer}</div>}
       </div>
     </div>
   );
@@ -137,15 +136,15 @@ function CellDisplay({ column, value }: { column: Column; value: CellValue }) {
 
   switch (column.type) {
     case 'currency':
-      return isEmpty ? <span className="cell-empty">—</span> : <>{formatCurrency(toNumber(value))}</>;
+      return isEmpty ? <span className="text-slate-500 font-mono">—</span> : <>{formatCurrency(toNumber(value))}</>;
     case 'number':
-      return isEmpty ? <span className="cell-empty">—</span> : <>{formatNumber(toNumber(value))}</>;
+      return isEmpty ? <span className="text-slate-500 font-mono">—</span> : <>{formatNumber(toNumber(value))}</>;
     case 'date':
-      return isEmpty ? <span className="cell-empty">—</span> : <>{formatDate(String(value))}</>;
+      return isEmpty ? <span className="text-slate-500 font-mono">—</span> : <>{formatDate(String(value))}</>;
     case 'select':
-      return isEmpty ? <span className="cell-empty">—</span> : <span className="cell-tag">{String(value)}</span>;
+      return isEmpty ? <span className="text-slate-500 font-mono">—</span> : <span className="inline-block px-2 py-0.5 rounded-md bg-violet-500/10 text-violet-300 border border-violet-500/20 text-[11px] font-medium">{String(value)}</span>;
     default:
-      return isEmpty ? <span className="cell-empty">—</span> : <>{String(value)}</>;
+      return isEmpty ? <span className="text-slate-500 font-mono">—</span> : <>{String(value)}</>;
   }
 }
 
@@ -185,7 +184,7 @@ function CellEditor({
   if (column.type === 'select') {
     return (
       <select
-        className="cell-input"
+        className="w-full bg-[#18181f] border border-violet-500 rounded px-2 py-1 text-xs text-white focus:outline-none focus:ring-1 focus:ring-violet-500 cursor-pointer"
         autoFocus
         value={draft}
         onChange={e => onCommit(e.target.value)}
@@ -194,7 +193,7 @@ function CellEditor({
       >
         <option value="">—</option>
         {(column.options ?? []).map(opt => (
-          <option key={opt} value={opt}>
+          <option key={opt} value={opt} className="bg-[#18181f] text-white">
             {opt}
           </option>
         ))}
@@ -207,7 +206,7 @@ function CellEditor({
 
   return (
     <input
-      className="cell-input"
+      className="w-full bg-[#18181f] border border-violet-500 rounded px-2 py-1 text-xs text-white focus:outline-none focus:ring-1 focus:ring-violet-500"
       type={inputType}
       autoFocus
       value={draft}
@@ -415,55 +414,55 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
   function renderDashboard() {
     return (
       <div className="animate-fade-in">
-        <div className="dashboard-header">
-          <h1 className="dashboard-title">
-            Your <span>Works</span>
+        <div className="mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+            Your <span className="text-violet-400">Works</span>
           </h1>
         </div>
 
-        <div className="summary-cards">
-          <div className="summary-card">
-            <div className="summary-icon" style={{ background: 'rgba(139, 92, 246, 0.12)', color: 'var(--accent-purple)' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <div className="bg-[#121217] border border-white/10 rounded-2xl p-5 flex items-center gap-4 shadow-lg hover:border-white/20 transition-colors">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0 bg-violet-500/10 text-violet-400">
               📁
             </div>
-            <div className="summary-info">
-              <h3>Total Works</h3>
-              <div className="value">{totalWorks}</div>
+            <div className="flex flex-col">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Total Works</h3>
+              <div className="text-xl font-bold text-white font-mono tabular-nums">{totalWorks}</div>
             </div>
           </div>
-          <div className="summary-card">
-            <div className="summary-icon" style={{ background: 'rgba(59, 130, 246, 0.12)', color: 'var(--accent-blue)' }}>
+          <div className="bg-[#121217] border border-white/10 rounded-2xl p-5 flex items-center gap-4 shadow-lg hover:border-white/20 transition-colors">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0 bg-blue-500/10 text-blue-400">
               📝
             </div>
-            <div className="summary-info">
-              <h3>Total Entries</h3>
-              <div className="value">{totalRows}</div>
+            <div className="flex flex-col">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Total Entries</h3>
+              <div className="text-xl font-bold text-white font-mono tabular-nums">{totalRows}</div>
             </div>
           </div>
-          <div className="summary-card">
-            <div className="summary-icon" style={{ background: 'rgba(244, 63, 94, 0.12)', color: 'var(--accent-rose)' }}>
+          <div className="bg-[#121217] border border-white/10 rounded-2xl p-5 flex items-center gap-4 shadow-lg hover:border-white/20 transition-colors">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0 bg-rose-500/10 text-rose-400">
               💰
             </div>
-            <div className="summary-info">
-              <h3>Total Value</h3>
-              <div className="value">{formatCurrency(grandTotal)}</div>
+            <div className="flex flex-col">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Total Value</h3>
+              <div className="text-xl font-bold text-white font-mono tabular-nums">{formatCurrency(grandTotal)}</div>
             </div>
           </div>
         </div>
 
-        <div className="section-header">
-          <h2 className="section-title">All Works</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-white">All Works</h2>
         </div>
 
-        <div className="works-grid">
-          <button type="button" className="create-work-card" onClick={() => setShowCreateWork(true)} id="create-work-btn">
-            <div className="create-work-icon">{Icons.plus}</div>
-            <span>Create New Work</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <button type="button" className="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 border-dashed border-white/15 bg-white/[0.02] hover:bg-white/[0.04] hover:border-violet-500/50 text-slate-300 hover:text-white transition-all duration-200 cursor-pointer group min-h-[190px]" onClick={() => setShowCreateWork(true)} id="create-work-btn">
+            <div className="w-10 h-10 rounded-xl bg-violet-600/10 text-violet-400 flex items-center justify-center group-hover:scale-110 group-hover:bg-violet-600 group-hover:text-white transition-all">{Icons.plus}</div>
+            <span className="text-sm font-semibold">Create New Work</span>
           </button>
 
-          <button type="button" className="import-sheet-card" onClick={() => setShowImport(true)} id="import-sheet-btn">
-            <div className="import-sheet-icon">{Icons.link}</div>
-            <span>Import from Google Sheets</span>
+          <button type="button" className="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 border-dashed border-emerald-500/25 bg-emerald-500/[0.02] hover:bg-emerald-500/[0.05] hover:border-emerald-500/50 text-emerald-300 hover:text-emerald-200 transition-all duration-200 cursor-pointer group min-h-[190px]" onClick={() => setShowImport(true)} id="import-sheet-btn">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all">{Icons.link}</div>
+            <span className="text-sm font-semibold">Import from Google Sheets</span>
           </button>
 
           {works.map((work, i) => {
@@ -473,7 +472,7 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
               <div
                 role="button"
                 tabIndex={0}
-                className="work-card"
+                className="relative bg-[#121217] border border-white/10 rounded-2xl p-5 shadow-lg hover:border-white/20 hover:shadow-xl transition-all duration-200 flex flex-col justify-between cursor-pointer group min-h-[190px]"
                 key={work.id}
                 style={{ animationDelay: `${i * 0.05}s` }}
                 onClick={() => setView({ type: 'work', workId: work.id })}
@@ -485,47 +484,49 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
                 }}
                 id={`work-card-${work.id}`}
               >
-                <div className="work-card-accent" style={{ background: work.color }} />
-                <div className="work-card-top">
-                  <div className="work-card-color" style={{ background: work.color }}>
-                    {work.name.charAt(0).toUpperCase()}
+                <div className="absolute top-0 left-5 right-5 h-[2px] rounded-t opacity-80 group-hover:opacity-100 transition-opacity" style={{ background: work.color }} />
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-inner" style={{ background: work.color }}>
+                      {work.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+                      <button
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                        onClick={e => { e.stopPropagation(); openEditWork(work.id); }}
+                        aria-label="Edit work"
+                      >
+                        {Icons.edit}
+                      </button>
+                      <button
+                        className="p-1.5 rounded-lg text-rose-400/80 hover:text-rose-300 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                        onClick={e => { e.stopPropagation(); setConfirmDelete({ type: 'work', workId: work.id }); }}
+                        aria-label="Delete work"
+                      >
+                        {Icons.trash}
+                      </button>
+                    </div>
                   </div>
-                  <div className="work-card-actions">
-                    <button
-                      className="btn-icon"
-                      onClick={e => { e.stopPropagation(); openEditWork(work.id); }}
-                      aria-label="Edit work"
-                    >
-                      {Icons.edit}
-                    </button>
-                    <button
-                      className="btn-icon danger"
-                      onClick={e => { e.stopPropagation(); setConfirmDelete({ type: 'work', workId: work.id }); }}
-                      aria-label="Delete work"
-                    >
-                      {Icons.trash}
-                    </button>
-                  </div>
+                  <h3 className="text-base font-semibold text-white mb-1 truncate">{work.name}</h3>
+                  <p className="text-xs text-slate-400 line-clamp-2 mb-3">{work.description || 'No description'}</p>
+                  {work.sheet && (
+                    <div className="inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md mb-3 self-start">
+                      {Icons.link} Google Sheet
+                    </div>
+                  )}
                 </div>
-                <h3>{work.name}</h3>
-                <p>{work.description || 'No description'}</p>
-                {work.sheet && (
-                  <div className="work-card-linked-badge">
-                    {Icons.link} Google Sheet
+                <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/5">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Rows</span>
+                    <span className="text-xs font-bold text-slate-200 font-mono tabular-nums">{work.rows.length}</span>
                   </div>
-                )}
-                <div className="work-card-stats">
-                  <div className="work-card-stat">
-                    <span className="work-card-stat-label">Rows</span>
-                    <span className="work-card-stat-value">{work.rows.length}</span>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Total</span>
+                    <span className="text-xs font-bold text-slate-200 font-mono tabular-nums truncate">{workTotal === null ? '—' : formatCurrency(workTotal)}</span>
                   </div>
-                  <div className="work-card-stat">
-                    <span className="work-card-stat-label">Total</span>
-                    <span className="work-card-stat-value">{workTotal === null ? '—' : formatCurrency(workTotal)}</span>
-                  </div>
-                  <div className="work-card-stat">
-                    <span className="work-card-stat-label">Created</span>
-                    <span className="work-card-stat-value">{formatDate(work.createdAt)}</span>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Created</span>
+                    <span className="text-xs font-bold text-slate-200 font-mono tabular-nums">{formatDate(work.createdAt)}</span>
                   </div>
                 </div>
               </div>
@@ -534,10 +535,10 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
         </div>
 
         {works.length === 0 && (
-          <div className="empty-state">
-            <div className="empty-state-icon">🚀</div>
-            <h3>Start tracking your data</h3>
-            <p>Create your first Work to begin building your own table with custom columns.</p>
+          <div className="text-center py-16 px-4 bg-[#121217] border border-white/10 rounded-2xl my-6 flex flex-col items-center justify-center">
+            <div className="text-4xl mb-3">🚀</div>
+            <h3 className="text-base font-semibold text-white mb-1">Start tracking your data</h3>
+            <p className="text-xs text-slate-400 max-w-sm">Create your first Work to begin building your own table with custom columns.</p>
           </div>
         )}
       </div>
@@ -551,11 +552,11 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
     const work = getWork(view.workId);
     if (!work) {
       return (
-        <div className="empty-state">
-          <div className="empty-state-icon">🔍</div>
-          <h3>Work not found</h3>
-          <p>This work no longer exists.</p>
-          <button className="btn btn-secondary" style={{ marginTop: '1rem' }} onClick={() => setView({ type: 'dashboard' })}>
+        <div className="text-center py-16 px-4 bg-[#121217] border border-white/10 rounded-2xl my-6 flex flex-col items-center justify-center">
+          <div className="text-4xl mb-3">🔍</div>
+          <h3 className="text-base font-semibold text-white mb-1">Work not found</h3>
+          <p className="text-xs text-slate-400 max-w-sm">This work no longer exists.</p>
+          <button className="inline-flex items-center gap-2 px-4 py-2 mt-4 text-sm font-medium rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 transition-colors cursor-pointer" onClick={() => setView({ type: 'dashboard' })}>
             {Icons.back} Back to Dashboard
           </button>
         </div>
@@ -568,27 +569,27 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
     const syncing = isSyncing(work.id);
 
     return (
-      <div className="work-detail">
+      <div className="animate-fade-in">
         {/* Header */}
-        <div className="work-detail-header">
-          <button className="back-btn" onClick={() => setView({ type: 'dashboard' })} id="back-to-dashboard">
+        <div className="flex items-center gap-4 mb-6">
+          <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer" onClick={() => setView({ type: 'dashboard' })} id="back-to-dashboard">
             {Icons.back} Back
           </button>
-          <div className="work-detail-info">
-            <h1 className="work-detail-name">
-              <span className="work-detail-dot" style={{ background: work.color }} />
+          <div className="flex-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5 truncate">
+              <span className="w-3 h-3 rounded-full shrink-0" style={{ background: work.color }} />
               {work.name}
             </h1>
-            {work.description && <p className="work-detail-desc">{work.description}</p>}
+            {work.description && <p className="text-xs text-slate-400 mt-1 truncate">{work.description}</p>}
           </div>
         </div>
 
         {/* Google Sheet sync bar */}
         {work.sheet && (
-          <div className={`sheet-bar ${work.sheet.lastError ? 'error' : ''}`}>
-            <div className="sheet-pill">
-              <span className="sheet-pill-icon">{Icons.link}</span>
-              <span className="sheet-pill-text">
+          <div className={`flex items-center justify-between flex-wrap gap-3 p-3.5 rounded-xl border mb-6 ${work.sheet.lastError ? 'bg-rose-500/10 border-rose-500/20 text-rose-300' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300'}`}>
+            <div className="flex items-center gap-2 text-xs font-medium">
+              <span className="shrink-0">{Icons.link}</span>
+              <span>
                 {work.sheet.lastError
                   ? `Sync failed — ${work.sheet.lastError}`
                   : work.sheet.lastSyncedAt
@@ -596,12 +597,12 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
                     : 'Synced from Google Sheets'}
               </span>
             </div>
-            <div className="sheet-bar-actions">
-              <button className="btn btn-secondary" onClick={() => refreshSheet(work.id)} disabled={syncing} id="sync-now-btn">
-                <span className={`sync-icon ${syncing ? 'spinning' : ''}`}>{Icons.refresh}</span>
+            <div className="flex items-center gap-2">
+              <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/15 text-white transition-colors cursor-pointer disabled:opacity-50" onClick={() => refreshSheet(work.id)} disabled={syncing} id="sync-now-btn">
+                <span className={`inline-block shrink-0 ${syncing ? 'animate-spin' : ''}`}>{Icons.refresh}</span>
                 {syncing ? 'Syncing…' : 'Sync now'}
               </button>
-              <button className="btn btn-secondary" onClick={() => setConfirmDelete({ type: 'unlink', workId: work.id })} id="unlink-sheet-btn">
+              <button className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-medium bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer" onClick={() => setConfirmDelete({ type: 'unlink', workId: work.id })} id="unlink-sheet-btn">
                 Unlink
               </button>
             </div>
@@ -609,38 +610,40 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
         )}
 
         {/* Notes (Markdown) */}
-        <div className="notes-card">
-          <div className="notes-card-head">
-            <h3 className="notes-card-title">{Icons.note} Notes</h3>
-            <button className="btn btn-secondary" onClick={() => openNotes(work.id)} id="edit-notes-btn">
+        <div className="bg-[#121217] border border-white/10 rounded-2xl p-5 mb-6 shadow-lg">
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
+              <span className="text-violet-400">{Icons.note}</span> Notes
+            </h3>
+            <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer" onClick={() => openNotes(work.id)} id="edit-notes-btn">
               {work.notes && work.notes.trim() ? <>{Icons.edit} Edit</> : <>{Icons.plus} Add note</>}
             </button>
           </div>
           {work.notes && work.notes.trim() ? (
-            <div className="notes-card-body">
+            <div className="bg-black/30 border border-white/5 rounded-xl p-4 max-h-60 overflow-y-auto">
               <Markdown source={work.notes} />
             </div>
           ) : (
-            <p className="notes-empty">
-              No notes yet. Add notes in <strong>Markdown</strong> to capture context, links, or a checklist for this work.
+            <p className="text-xs text-slate-400 py-1">
+              No notes yet. Add notes in <strong className="text-white">Markdown</strong> to capture context, links, or a checklist for this work.
             </p>
           )}
         </div>
 
         {/* Stats */}
-        <div className="expense-summary">
-          <div className="expense-summary-card">
-            <div className="label">Rows</div>
-            <div className="value" style={{ color: 'var(--accent-blue)' }}>{work.rows.length}</div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-6">
+          <div className="bg-[#121217] border border-white/10 rounded-xl p-3.5 shadow-sm">
+            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1 truncate">Rows</div>
+            <div className="text-base font-bold font-mono tabular-nums text-blue-400 truncate">{work.rows.length}</div>
           </div>
-          <div className="expense-summary-card">
-            <div className="label">Columns</div>
-            <div className="value" style={{ color: 'var(--accent-purple)' }}>{work.columns.length}</div>
+          <div className="bg-[#121217] border border-white/10 rounded-xl p-3.5 shadow-sm">
+            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1 truncate">Columns</div>
+            <div className="text-base font-bold font-mono tabular-nums text-violet-400 truncate">{work.columns.length}</div>
           </div>
           {numericColumns.map((col, i) => (
-            <div className="expense-summary-card" key={col.id}>
-              <div className="label">{col.name}</div>
-              <div className="value" style={{ color: STAT_ACCENTS[i % STAT_ACCENTS.length] }}>
+            <div className="bg-[#121217] border border-white/10 rounded-xl p-3.5 shadow-sm" key={col.id}>
+              <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1 truncate">{col.name}</div>
+              <div className="text-base font-bold font-mono tabular-nums truncate" style={{ color: STAT_ACCENTS[i % STAT_ACCENTS.length] }}>
                 {col.type === 'currency'
                   ? formatCurrency(columnTotal(work.rows, col.id))
                   : formatNumber(columnTotal(work.rows, col.id))}
@@ -653,17 +656,17 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
         {work.rows.length > 0 && <WorkCharts key={work.id} work={work} />}
 
         {/* Toolbar */}
-        <div className="table-toolbar">
-          <h3 className="expense-list-title">
-            Data <span className="expense-count-badge">{work.rows.length}</span>
+        <div className="flex items-center justify-between flex-wrap gap-3 mb-3">
+          <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+            Data <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-slate-300 font-mono">{work.rows.length}</span>
           </h3>
-          <div className="table-toolbar-actions">
-            <button className="btn btn-secondary" onClick={() => setShowColumns(work.id)} id="manage-columns-btn">
+          <div className="flex items-center gap-2.5">
+            <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer" onClick={() => setShowColumns(work.id)} id="manage-columns-btn">
               {Icons.columns} Manage Columns
             </button>
             {showRowActions && (
               <button
-                className="btn btn-primary"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-violet-600 hover:bg-violet-500 text-white shadow-md shadow-violet-900/30 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={() => addRow(work.id)}
                 disabled={work.columns.length === 0}
                 id="add-row-btn"
@@ -676,43 +679,43 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
 
         {/* Table */}
         {work.columns.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-state-icon">📐</div>
-            <h3>No columns yet</h3>
-            <p>Use “Manage Columns” to define the columns for this table.</p>
+          <div className="text-center py-16 px-4 bg-[#121217] border border-white/10 rounded-2xl my-6 flex flex-col items-center justify-center">
+            <div className="text-4xl mb-3">📐</div>
+            <h3 className="text-base font-semibold text-white mb-1">No columns yet</h3>
+            <p className="text-xs text-slate-400 max-w-sm">Use “Manage Columns” to define the columns for this table.</p>
           </div>
         ) : (
           <>
-            <div className="data-table-wrap">
-              <table className="data-table">
+            <div className="overflow-x-auto rounded-2xl border border-white/10 bg-[#121217] shadow-xl">
+              <table className="w-full border-collapse text-left text-xs">
                 <thead>
                   <tr>
                     {work.columns.map(col => (
-                      <th key={col.id} className={`type-${col.type} ${isSynced(col) ? 'th-synced' : ''}`}>
-                        <span className="th-inner">
-                          <span className="th-type">{getColumnTypeInfo(col.type).icon}</span>
+                      <th key={col.id} className={`sticky top-0 bg-[#16161d] text-slate-300 font-semibold text-[11px] tracking-wider uppercase px-4 py-3 border-b border-white/10 whitespace-nowrap ${col.type === 'currency' || col.type === 'number' ? 'text-right' : col.type === 'checkbox' ? 'text-center w-12' : ''}`}>
+                        <span className="inline-flex items-center gap-1.5">
+                          <span className="text-slate-500">{getColumnTypeInfo(col.type).icon}</span>
                           {col.name}
                           {isSynced(col) && (
-                            <span className="th-synced-mark" title="Synced from Google Sheet">{Icons.link}</span>
+                            <span className="text-emerald-400" title="Synced from Google Sheet">{Icons.link}</span>
                           )}
                         </span>
                       </th>
                     ))}
-                    {showRowActions && <th className="col-actions-head" aria-label="Row actions" />}
+                    {showRowActions && <th className="sticky top-0 bg-[#16161d] border-b border-white/10 w-12 text-center" aria-label="Row actions" />}
                   </tr>
                 </thead>
                 <tbody>
                   {work.rows.map(row => (
-                    <tr key={row.id} id={`row-${row.id}`}>
+                    <tr key={row.id} id={`row-${row.id}`} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
                       {work.columns.map(col => {
                         const value = row.cells[col.id] ?? null;
                         const readOnly = isSynced(col);
                         if (col.type === 'checkbox') {
                           return (
-                            <td key={col.id} className={`data-cell type-checkbox ${readOnly ? 'cell-readonly' : ''}`}>
+                            <td key={col.id} className={`px-4 py-3 text-center align-middle ${readOnly ? 'opacity-70 cursor-default' : ''}`}>
                               <input
                                 type="checkbox"
-                                className="cell-checkbox"
+                                className="w-4 h-4 rounded border-white/20 bg-black/40 text-violet-600 focus:ring-violet-500 focus:ring-offset-0 cursor-pointer disabled:cursor-default"
                                 checked={value === true}
                                 disabled={readOnly}
                                 onChange={e => { if (!readOnly) updateCell(work.id, row.id, col.id, e.target.checked); }}
@@ -722,7 +725,7 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
                         }
                         if (readOnly) {
                           return (
-                            <td key={col.id} className={`data-cell type-${col.type} cell-readonly`}>
+                            <td key={col.id} className={`px-4 py-3 align-middle text-slate-400 cursor-default ${col.type === 'currency' || col.type === 'number' ? 'text-right font-mono tabular-nums' : ''}`}>
                               <CellDisplay column={col} value={value} />
                             </td>
                           );
@@ -731,7 +734,7 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
                         return (
                           <td
                             key={col.id}
-                            className={`data-cell type-${col.type} ${isEditing ? 'editing' : ''}`}
+                            className={`px-4 py-3 align-middle transition-colors cursor-pointer hover:bg-white/[0.04] ${col.type === 'currency' || col.type === 'number' ? 'text-right font-mono tabular-nums' : ''} ${isEditing ? 'p-1 bg-black/70' : ''}`}
                             onClick={() => { if (!isEditing) setEditing({ rowId: row.id, columnId: col.id }); }}
                           >
                             {isEditing ? (
@@ -748,9 +751,9 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
                         );
                       })}
                       {showRowActions && (
-                        <td className="col-actions">
+                        <td className="w-12 text-center px-2 py-1 align-middle">
                           <button
-                            className="btn-icon danger"
+                            className="p-1.5 rounded-lg text-rose-400/70 hover:text-rose-300 hover:bg-rose-500/10 transition-colors opacity-40 group-hover:opacity-100 cursor-pointer"
                             onClick={() => deleteRow(work.id, row.id)}
                             aria-label="Delete row"
                           >
@@ -763,23 +766,23 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
                 </tbody>
                 {hasNumeric && work.rows.length > 0 && (
                   <tfoot>
-                    <tr>
+                    <tr className="bg-[#16161d]/90 border-t-2 border-white/10 font-semibold text-white">
                       {work.columns.map((col, i) => {
                         if (NUMERIC_TYPES.includes(col.type)) {
                           const total = columnTotal(work.rows, col.id);
                           return (
-                            <td key={col.id} className={`data-cell type-${col.type} cell-total`}>
+                            <td key={col.id} className="px-4 py-3 text-right font-mono tabular-nums text-xs font-bold text-white">
                               {col.type === 'currency' ? formatCurrency(total) : formatNumber(total)}
                             </td>
                           );
                         }
                         return (
-                          <td key={col.id} className="cell-total">
+                          <td key={col.id} className="px-4 py-3 text-xs font-bold text-slate-300">
                             {i === 0 ? 'Total' : ''}
                           </td>
                         );
                       })}
-                      {showRowActions && <td className="cell-total" />}
+                      {showRowActions && <td className="px-4 py-3" />}
                     </tr>
                   </tfoot>
                 )}
@@ -787,10 +790,10 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
             </div>
 
             {work.rows.length === 0 && (
-              <div className="empty-state">
-                <div className="empty-state-icon">📊</div>
-                <h3>No rows yet</h3>
-                <p>Click “Add Row” to start entering data into your table.</p>
+              <div className="text-center py-16 px-4 bg-[#121217] border border-white/10 rounded-2xl my-6 flex flex-col items-center justify-center">
+                <div className="text-4xl mb-3">📊</div>
+                <h3 className="text-base font-semibold text-white mb-1">No rows yet</h3>
+                <p className="text-xs text-slate-400 max-w-sm">Click “Add Row” to start entering data into your table.</p>
               </div>
             )}
           </>
@@ -806,31 +809,31 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
   // ---- Render ----
 
   return (
-    <div className="app">
-      <header className="header">
-        <div className="header-inner">
-          <button type="button" className="logo" onClick={() => setView({ type: 'dashboard' })} id="app-logo" aria-label="Go to dashboard">
-            <div className="logo-icon">💸</div>
-            <span className="logo-text">ExpenseTracker</span>
+    <div className="min-h-screen bg-[#09090d] text-slate-100 flex flex-col font-sans">
+      <header className="sticky top-0 z-40 bg-[#0c0c10]/80 backdrop-blur-md border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+          <button type="button" className="flex items-center gap-2.5 text-white font-semibold text-base tracking-tight hover:opacity-90 transition-opacity bg-transparent border-none cursor-pointer p-0" onClick={() => setView({ type: 'dashboard' })} id="app-logo" aria-label="Go to dashboard">
+            <div className="w-8 h-8 rounded-xl bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-lg">💸</div>
+            <span className="font-bold text-white tracking-tight">ExpenseTracker</span>
           </button>
-          <div className="header-stats">
-            <div className="header-stat">
-              <span className="header-stat-label">Works</span>
-              <span className="header-stat-value">{totalWorks}</span>
+          <div className="flex items-center gap-4 sm:gap-6">
+            <div className="hidden md:flex flex-col items-end">
+              <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Works</span>
+              <span className="text-xs font-bold text-white font-mono tabular-nums">{totalWorks}</span>
             </div>
-            <div className="header-stat">
-              <span className="header-stat-label">Total Value</span>
-              <span className="header-stat-value">{formatCurrency(grandTotal)}</span>
+            <div className="hidden md:flex flex-col items-end">
+              <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Total Value</span>
+              <span className="text-xs font-bold text-white font-mono tabular-nums">{formatCurrency(grandTotal)}</span>
             </div>
-            <div className="header-user">
-              <div className="header-avatar" title={user.fullName}>
+            <div className="flex items-center gap-3 pl-4 border-l border-white/10">
+              <div className="w-8 h-8 rounded-full bg-violet-600/30 border border-violet-500/40 text-violet-300 font-semibold text-xs flex items-center justify-center" title={user.fullName}>
                 {user.fullName.charAt(0).toUpperCase()}
               </div>
-              <div className="header-user-info">
-                <span className="header-user-name">{user.fullName}</span>
-                <span className="header-user-email">{user.email}</span>
+              <div className="hidden sm:flex flex-col text-left">
+                <span className="text-xs font-semibold text-white leading-tight">{user.fullName}</span>
+                <span className="text-[11px] text-slate-400 leading-tight truncate max-w-[140px]">{user.email}</span>
               </div>
-              <button className="btn-icon" onClick={onLogout} aria-label="Log out" title="Log out" id="logout-btn">
+              <button className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer" onClick={onLogout} aria-label="Log out" title="Log out" id="logout-btn">
                 {Icons.logout}
               </button>
             </div>
@@ -838,7 +841,7 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
         </div>
       </header>
 
-      <main className="main">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8">
         {view.type === 'dashboard' ? renderDashboard() : renderWorkDetail()}
       </main>
 
@@ -846,15 +849,15 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
       {showCreateWork && (
         <Modal title="Create New Work" onClose={() => setShowCreateWork(false)} footer={
           <>
-            <button type="button" className="btn btn-secondary" onClick={() => setShowCreateWork(false)}>Cancel</button>
-            <button type="submit" form="create-work-form" className="btn btn-primary" id="submit-create-work">Create Work</button>
+            <button type="button" className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-colors cursor-pointer" onClick={() => setShowCreateWork(false)}>Cancel</button>
+            <button type="submit" form="create-work-form" className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-violet-600 hover:bg-violet-500 text-white shadow-md shadow-violet-900/30 transition-colors cursor-pointer" id="submit-create-work">Create Work</button>
           </>
         }>
-          <form onSubmit={handleCreateWork} id="create-work-form">
-            <div className="form-group">
-              <label className="form-label" htmlFor="work-name">Work Name</label>
+          <form onSubmit={handleCreateWork} id="create-work-form" className="space-y-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-300 tracking-wide uppercase" htmlFor="work-name">Work Name</label>
               <input
-                className="form-input"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors"
                 id="work-name"
                 type="text"
                 placeholder="e.g. Client Project, Office Expenses"
@@ -864,30 +867,30 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
                 required
               />
             </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="work-desc">Description (optional)</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-300 tracking-wide uppercase" htmlFor="work-desc">Description (optional)</label>
               <textarea
-                className="form-textarea"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors resize-y min-h-[80px]"
                 id="work-desc"
                 placeholder="Brief description of this work..."
                 value={newWorkDesc}
                 onChange={e => setNewWorkDesc(e.target.value)}
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Color</label>
-              <div className="color-picker">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-300 tracking-wide uppercase">Color</label>
+              <div className="flex items-center gap-2 flex-wrap pt-1">
                 {WORK_COLORS.map(c => (
                   <div
                     key={c}
-                    className={`color-swatch ${newWorkColor === c ? 'active' : ''}`}
-                    style={{ background: c, color: c }}
+                    className={`w-7 h-7 rounded-full cursor-pointer transition-transform duration-150 hover:scale-110 flex items-center justify-center border-2 ${newWorkColor === c ? 'border-white ring-2 ring-violet-500 ring-offset-2 ring-offset-[#121217] scale-110' : 'border-transparent opacity-80 hover:opacity-100'}`}
+                    style={{ background: c }}
                     onClick={() => setNewWorkColor(c)}
                   />
                 ))}
               </div>
             </div>
-            <p className="hint-text">New works start with <strong>Item</strong>, <strong>Amount</strong> and <strong>Date</strong> columns — customize them anytime.</p>
+            <p className="text-xs text-slate-400 leading-relaxed">New works start with <strong className="text-white">Item</strong>, <strong className="text-white">Amount</strong> and <strong className="text-white">Date</strong> columns — customize them anytime.</p>
           </form>
         </Modal>
       )}
@@ -899,11 +902,11 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
           onClose={() => { if (!importing) setShowImport(false); }}
           footer={
             <>
-              <button type="button" className="btn btn-secondary" onClick={() => setShowImport(false)} disabled={importing}>Cancel</button>
+              <button type="button" className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-colors cursor-pointer disabled:opacity-50" onClick={() => setShowImport(false)} disabled={importing}>Cancel</button>
               <button
                 type="submit"
                 form="import-sheet-form"
-                className="btn btn-primary"
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-900/30 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={importing || !importUrl.trim()}
                 id="submit-import-sheet"
               >
@@ -912,11 +915,11 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
             </>
           }
         >
-          <form onSubmit={handleImportSheet} id="import-sheet-form">
-            <div className="form-group">
-              <label className="form-label" htmlFor="import-url">Google Sheets URL</label>
+          <form onSubmit={handleImportSheet} id="import-sheet-form" className="space-y-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-300 tracking-wide uppercase" htmlFor="import-url">Google Sheets URL</label>
               <input
-                className="form-input"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors"
                 id="import-url"
                 type="url"
                 placeholder="https://docs.google.com/spreadsheets/d/…"
@@ -926,10 +929,10 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
                 required
               />
             </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="import-name">Name (optional)</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-300 tracking-wide uppercase" htmlFor="import-name">Name (optional)</label>
               <input
-                className="form-input"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors"
                 id="import-name"
                 type="text"
                 placeholder="Imported Sheet"
@@ -937,23 +940,23 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
                 onChange={e => setImportName(e.target.value)}
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Color</label>
-              <div className="color-picker">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-300 tracking-wide uppercase">Color</label>
+              <div className="flex items-center gap-2 flex-wrap pt-1">
                 {WORK_COLORS.map(c => (
                   <div
                     key={c}
-                    className={`color-swatch ${importColor === c ? 'active' : ''}`}
-                    style={{ background: c, color: c }}
+                    className={`w-7 h-7 rounded-full cursor-pointer transition-transform duration-150 hover:scale-110 flex items-center justify-center border-2 ${importColor === c ? 'border-white ring-2 ring-emerald-500 ring-offset-2 ring-offset-[#121217] scale-110' : 'border-transparent opacity-80 hover:opacity-100'}`}
+                    style={{ background: c }}
                     onClick={() => setImportColor(c)}
                   />
                 ))}
               </div>
             </div>
-            {importError && <p className="import-error">{importError}</p>}
-            <p className="hint-text">
-              The sheet must be shared as <strong>“Anyone with the link”</strong> (or published via File → Share → Publish to web).
-              Its columns and rows are mirrored here and <strong>refresh every 5 minutes</strong> while this app is open.
+            {importError && <p className="text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl p-3">{importError}</p>}
+            <p className="text-xs text-slate-400 leading-relaxed">
+              The sheet must be shared as <strong className="text-white">“Anyone with the link”</strong> (or published via File → Share → Publish to web).
+              Its columns and rows are mirrored here and <strong className="text-white">refresh every 5 minutes</strong> while this app is open.
               You can add your own extra columns afterwards — they stay editable and are kept on each refresh.
             </p>
           </form>
@@ -964,15 +967,15 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
       {showEditWork && (
         <Modal title="Edit Work" onClose={() => setShowEditWork(null)} footer={
           <>
-            <button type="button" className="btn btn-secondary" onClick={() => setShowEditWork(null)}>Cancel</button>
-            <button type="submit" form="edit-work-form" className="btn btn-primary" id="submit-edit-work">Save Changes</button>
+            <button type="button" className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-colors cursor-pointer" onClick={() => setShowEditWork(null)}>Cancel</button>
+            <button type="submit" form="edit-work-form" className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-violet-600 hover:bg-violet-500 text-white shadow-md shadow-violet-900/30 transition-colors cursor-pointer" id="submit-edit-work">Save Changes</button>
           </>
         }>
-          <form onSubmit={handleEditWork} id="edit-work-form">
-            <div className="form-group">
-              <label className="form-label" htmlFor="edit-work-name">Work Name</label>
+          <form onSubmit={handleEditWork} id="edit-work-form" className="space-y-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-300 tracking-wide uppercase" htmlFor="edit-work-name">Work Name</label>
               <input
-                className="form-input"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors"
                 id="edit-work-name"
                 type="text"
                 value={editWorkName}
@@ -981,23 +984,23 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
                 required
               />
             </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="edit-work-desc">Description</label>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-300 tracking-wide uppercase" htmlFor="edit-work-desc">Description</label>
               <textarea
-                className="form-textarea"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3.5 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors resize-y min-h-[80px]"
                 id="edit-work-desc"
                 value={editWorkDesc}
                 onChange={e => setEditWorkDesc(e.target.value)}
               />
             </div>
-            <div className="form-group">
-              <label className="form-label">Color</label>
-              <div className="color-picker">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-300 tracking-wide uppercase">Color</label>
+              <div className="flex items-center gap-2 flex-wrap pt-1">
                 {WORK_COLORS.map(c => (
                   <div
                     key={c}
-                    className={`color-swatch ${editWorkColor === c ? 'active' : ''}`}
-                    style={{ background: c, color: c }}
+                    className={`w-7 h-7 rounded-full cursor-pointer transition-transform duration-150 hover:scale-110 flex items-center justify-center border-2 ${editWorkColor === c ? 'border-white ring-2 ring-violet-500 ring-offset-2 ring-offset-[#121217] scale-110' : 'border-transparent opacity-80 hover:opacity-100'}`}
+                    style={{ background: c }}
                     onClick={() => setEditWorkColor(c)}
                   />
                 ))}
@@ -1015,18 +1018,18 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
           onClose={() => setShowNotes(null)}
           footer={
             <>
-              <button className="btn btn-secondary" onClick={() => setShowNotes(null)}>Cancel</button>
-              <button className="btn btn-primary" onClick={handleSaveNotes} id="save-notes-btn">Save Notes</button>
+              <button className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-colors cursor-pointer" onClick={() => setShowNotes(null)}>Cancel</button>
+              <button className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-violet-600 hover:bg-violet-500 text-white shadow-md shadow-violet-900/30 transition-colors cursor-pointer" onClick={handleSaveNotes} id="save-notes-btn">Save Notes</button>
             </>
           }
         >
-          <div className="notes-editor">
-            <div className="notes-tabs" role="tablist" aria-label="Notes editor mode">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-1 p-1 bg-black/40 border border-white/10 rounded-xl" role="tablist" aria-label="Notes editor mode">
               <button
                 type="button"
                 role="tab"
                 aria-selected={notesTab === 'write'}
-                className={`notes-tab ${notesTab === 'write' ? 'active' : ''}`}
+                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${notesTab === 'write' ? 'bg-violet-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
                 onClick={() => setNotesTab('write')}
               >
                 Write
@@ -1035,7 +1038,7 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
                 type="button"
                 role="tab"
                 aria-selected={notesTab === 'preview'}
-                className={`notes-tab ${notesTab === 'preview' ? 'active' : ''}`}
+                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${notesTab === 'preview' ? 'bg-violet-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
                 onClick={() => setNotesTab('preview')}
               >
                 Preview
@@ -1044,7 +1047,7 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
 
             {notesTab === 'write' ? (
               <textarea
-                className="form-textarea notes-textarea"
+                className="w-full bg-black/40 border border-white/10 rounded-xl p-3.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors resize-y min-h-[220px]"
                 id="notes-textarea"
                 value={notesDraft}
                 onChange={e => setNotesDraft(e.target.value)}
@@ -1052,18 +1055,18 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
                 autoFocus
               />
             ) : (
-              <div className="notes-preview">
+              <div className="min-h-[220px] p-4 bg-black/30 border border-white/10 rounded-xl overflow-y-auto max-h-[350px]">
                 {notesDraft.trim() ? (
                   <Markdown source={notesDraft} />
                 ) : (
-                  <p className="notes-empty">Nothing to preview yet — switch to “Write” and jot something down.</p>
+                  <p className="text-xs text-slate-400 py-1">Nothing to preview yet — switch to “Write” and jot something down.</p>
                 )}
               </div>
             )}
           </div>
-          <p className="hint-text">
-            Supports Markdown — headings, <strong>**bold**</strong>, <em>*italic*</em>, <code>`code`</code>,
-            lists, &gt; quotes, links, and <code>```</code> code blocks.
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Supports Markdown — headings, <strong className="text-white">**bold**</strong>, <em className="text-white">*italic*</em>, <code className="bg-white/10 text-violet-300 font-mono text-xs px-1 rounded">`code`</code>,
+            lists, &gt; quotes, links, and <code className="bg-white/10 text-violet-300 font-mono text-xs px-1 rounded">```</code> code blocks.
           </p>
         </Modal>
       )}
@@ -1071,12 +1074,12 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
       {/* Column Manager Modal */}
       {managerWork && (
         <Modal title="Manage Columns" wide onClose={() => setShowColumns(null)} footer={
-          <button className="btn btn-primary" onClick={() => setShowColumns(null)}>Done</button>
+          <button className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-violet-600 hover:bg-violet-500 text-white shadow-md shadow-violet-900/30 transition-colors cursor-pointer" onClick={() => setShowColumns(null)}>Done</button>
         }>
-          <div className="col-manager-list">
+          <div className="space-y-2.5 max-h-[40vh] overflow-y-auto pr-1">
             {managerWork.sheet && (
-              <p className="hint-text col-manager-hint">
-                {Icons.link} Columns tagged <strong>sheet</strong> are synced from Google Sheets and locked. Columns you add below are yours — editable and kept on every refresh.
+              <p className="text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 flex items-center gap-1.5 leading-relaxed">
+                <span className="shrink-0">{Icons.link}</span> Columns tagged <strong className="font-semibold text-white">sheet</strong> are synced from Google Sheets and locked. Columns you add below are yours — editable and kept on every refresh.
               </p>
             )}
             {managerWork.columns.map((col, i) => {
@@ -1084,12 +1087,12 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
               const prevLocked = i > 0 && isSynced(managerWork.columns[i - 1]);
               const nextLocked = i < managerWork.columns.length - 1 && isSynced(managerWork.columns[i + 1]);
               return (
-                <div className={`col-manager-item ${locked ? 'col-locked' : ''}`} key={col.id}>
-                  <span className="type-badge" title={getColumnTypeInfo(col.type).label}>
+                <div className={`flex items-center gap-2.5 p-2.5 bg-black/40 border border-white/10 rounded-xl ${locked ? 'opacity-80' : ''}`} key={col.id}>
+                  <span className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-xs shrink-0 text-slate-400" title={getColumnTypeInfo(col.type).label}>
                     {getColumnTypeInfo(col.type).icon}
                   </span>
                   <input
-                    className="form-input"
+                    className="flex-1 bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 disabled:opacity-60 disabled:cursor-not-allowed"
                     value={col.name}
                     disabled={locked}
                     onChange={e => updateColumn(managerWork.id, col.id, { name: e.target.value })}
@@ -1097,7 +1100,7 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
                   />
                   {col.type === 'select' && (
                     <input
-                      className="form-input"
+                      className="flex-1 bg-black/40 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-violet-500 disabled:opacity-60 disabled:cursor-not-allowed"
                       placeholder="Options, comma-separated"
                       value={(col.options ?? []).join(', ')}
                       disabled={locked}
@@ -1105,15 +1108,15 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
                       aria-label="Dropdown options"
                     />
                   )}
-                  {locked && <span className="col-sheet-tag">{Icons.link} sheet</span>}
-                  <div className="col-manager-actions">
-                    <button className="btn-icon" disabled={i === 0 || locked || prevLocked} onClick={() => moveColumn(managerWork.id, col.id, 'left')} aria-label="Move left">
+                  {locked && <span className="text-[11px] font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md flex items-center gap-1 shrink-0">{Icons.link} sheet</span>}
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed" disabled={i === 0 || locked || prevLocked} onClick={() => moveColumn(managerWork.id, col.id, 'left')} aria-label="Move left">
                       {Icons.up}
                     </button>
-                    <button className="btn-icon" disabled={i === managerWork.columns.length - 1 || locked || nextLocked} onClick={() => moveColumn(managerWork.id, col.id, 'right')} aria-label="Move right">
+                    <button className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed" disabled={i === managerWork.columns.length - 1 || locked || nextLocked} onClick={() => moveColumn(managerWork.id, col.id, 'right')} aria-label="Move right">
                       {Icons.down}
                     </button>
-                    <button className="btn-icon danger" disabled={locked} onClick={() => setConfirmDelete({ type: 'column', workId: managerWork.id, columnId: col.id })} aria-label="Delete column">
+                    <button className="p-1.5 rounded-lg text-rose-400/80 hover:text-rose-300 hover:bg-rose-500/10 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed" disabled={locked} onClick={() => setConfirmDelete({ type: 'column', workId: managerWork.id, columnId: col.id })} aria-label="Delete column">
                       {Icons.trash}
                     </button>
                   </div>
@@ -1121,15 +1124,15 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
               );
             })}
             {managerWork.columns.length === 0 && (
-              <p className="hint-text">No columns yet. Add one below to get started.</p>
+              <p className="text-xs text-slate-400">No columns yet. Add one below to get started.</p>
             )}
           </div>
 
-          <div className="col-add-form">
-            <div className="form-group">
-              <label className="form-label" htmlFor="new-col-name">New Column</label>
+          <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row gap-2.5 items-end">
+            <div className="flex-1 w-full flex flex-col gap-1">
+              <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider" htmlFor="new-col-name">New Column</label>
               <input
-                className="form-input"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-violet-500"
                 id="new-col-name"
                 type="text"
                 placeholder="Column name"
@@ -1138,24 +1141,24 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
                 onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddColumn(); } }}
               />
             </div>
-            <div className="form-group">
-              <label className="form-label" htmlFor="new-col-type">Type</label>
+            <div className="w-full sm:w-36 flex flex-col gap-1">
+              <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider" htmlFor="new-col-type">Type</label>
               <select
-                className="form-select"
+                className="w-full bg-black/40 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-violet-500 cursor-pointer"
                 id="new-col-type"
                 value={newColType}
                 onChange={e => setNewColType(e.target.value as ColumnType)}
               >
                 {COLUMN_TYPES.map(t => (
-                  <option key={t.value} value={t.value}>{t.icon} {t.label}</option>
+                  <option key={t.value} value={t.value} className="bg-[#18181f] text-white">{t.icon} {t.label}</option>
                 ))}
               </select>
             </div>
             {newColType === 'select' && (
-              <div className="form-group">
-                <label className="form-label" htmlFor="new-col-options">Options</label>
+              <div className="flex-1 w-full flex flex-col gap-1">
+                <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider" htmlFor="new-col-options">Options</label>
                 <input
-                  className="form-input"
+                  className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-violet-500"
                   id="new-col-options"
                   type="text"
                   placeholder="e.g. Low, Medium, High"
@@ -1164,7 +1167,7 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
                 />
               </div>
             )}
-            <button className="btn btn-primary col-add-btn" onClick={handleAddColumn} id="add-column-btn">
+            <button className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-violet-600 hover:bg-violet-500 text-white transition-colors cursor-pointer shrink-0" onClick={handleAddColumn} id="add-column-btn">
               {Icons.plus} Add Column
             </button>
           </div>
@@ -1184,22 +1187,22 @@ function ExpenseApp({ user, onLogout }: { user: StoredUser; onLogout: () => void
           onClose={() => setConfirmDelete(null)}
           footer={
             <>
-              <button className="btn btn-secondary" onClick={() => setConfirmDelete(null)}>Cancel</button>
+              <button className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 transition-colors cursor-pointer" onClick={() => setConfirmDelete(null)}>Cancel</button>
               {confirmDelete.type === 'unlink' ? (
-                <button className="btn btn-primary" onClick={handleConfirmDelete} id="confirm-delete-btn">Unlink</button>
+                <button className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-violet-600 hover:bg-violet-500 text-white shadow-md shadow-violet-900/30 transition-colors cursor-pointer" onClick={handleConfirmDelete} id="confirm-delete-btn">Unlink</button>
               ) : (
-                <button className="btn btn-danger" onClick={handleConfirmDelete} id="confirm-delete-btn">Delete</button>
+                <button className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-xl bg-rose-600 hover:bg-rose-500 text-white shadow-md shadow-rose-900/30 transition-colors cursor-pointer" onClick={handleConfirmDelete} id="confirm-delete-btn">Delete</button>
               )}
             </>
           }
         >
-          <p className="confirm-text">
+          <p className="text-sm text-slate-300 leading-relaxed">
             {confirmDelete.type === 'work' ? (
-              <>Are you sure you want to delete this work? <strong>All rows and columns inside it will also be deleted.</strong> This action cannot be undone.</>
+              <>Are you sure you want to delete this work? <strong className="text-white">All rows and columns inside it will also be deleted.</strong> This action cannot be undone.</>
             ) : confirmDelete.type === 'unlink' ? (
-              <>This stops syncing with Google Sheets. The current columns and data stay, and <strong>every column becomes editable</strong> — you can add and delete rows again. You can’t re-link automatically afterwards.</>
+              <>This stops syncing with Google Sheets. The current columns and data stay, and <strong className="text-white">every column becomes editable</strong> — you can add and delete rows again. You can’t re-link automatically afterwards.</>
             ) : (
-              <>Are you sure you want to delete this column? <strong>Its data will be removed from every row.</strong> This action cannot be undone.</>
+              <>Are you sure you want to delete this column? <strong className="text-white">Its data will be removed from every row.</strong> This action cannot be undone.</>
             )}
           </p>
         </Modal>

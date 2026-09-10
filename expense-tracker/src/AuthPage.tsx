@@ -1,13 +1,9 @@
 import { useState, type FormEvent } from 'react';
-import './AuthPage.css';
 import { login, signup, type StoredUser } from './authService';
 
 /* =========================================
-   AUTH PAGE — shared Login / Sign-up template
-   -----------------------------------------
-   Login and Sign up render through ONE card and share their state:
-   the email + password you type carry across when you toggle modes,
-   and both flows funnel through the same submit / error / loading path.
+   AUTH PAGE — Tailwind CSS v4
+   Shared Login / Sign-up template with glassmorphic styling
    ========================================= */
 
 type Mode = 'login' | 'signup';
@@ -36,7 +32,6 @@ const icons = {
 export default function AuthPage({ onAuthenticated }: { onAuthenticated: (user: StoredUser) => void }) {
   const [mode, setMode] = useState<Mode>('login');
 
-  // Shared info: these persist across the Login <-> Sign-up toggle.
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -52,7 +47,6 @@ export default function AuthPage({ onAuthenticated }: { onAuthenticated: (user: 
     if (next === mode || loading) return;
     setMode(next);
     setError(null);
-    // Email + password stay (shared info); confirm is signup-only, so reset it.
     setConfirm('');
   }
 
@@ -61,7 +55,6 @@ export default function AuthPage({ onAuthenticated }: { onAuthenticated: (user: 
     if (loading) return;
     setError(null);
 
-    // ---- Client-side validation (mirrors the backend's rules) ----
     if (!isLogin && !fullName.trim()) {
       setError('Please enter your full name.');
       return;
@@ -90,7 +83,6 @@ export default function AuthPage({ onAuthenticated }: { onAuthenticated: (user: 
       const res = isLogin
         ? await login(email.trim(), password)
         : await signup(fullName.trim(), email.trim(), password);
-      // authService has already stored the token + user; hand the user up to the app.
       onAuthenticated({ email: res.email, fullName: res.fullName });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
@@ -100,68 +92,110 @@ export default function AuthPage({ onAuthenticated }: { onAuthenticated: (user: 
   }
 
   return (
-    <div className="auth-page">
-      <div className="auth-visual" aria-hidden="true">
-        <div className="auth-orb auth-orb-one" />
-        <div className="auth-orb auth-orb-two" />
-        <div className="auth-orb auth-orb-three" />
-        <div className="auth-visual-copy">
-          <span className="auth-eyebrow">ExpenseTracker</span>
-          <h2>Make every rupee<br />feel accounted for.</h2>
-          <p>A focused workspace for the projects, purchases, and decisions that matter.</p>
-          <div className="auth-mini-card">
-            <span>Monthly overview</span>
-            <strong>₹24,800</strong>
-            <i><b /> <b /> <b /> <b /> <b /> <b /> <b /></i>
+    <div className="relative min-h-screen grid grid-cols-1 lg:grid-cols-[1fr_minmax(390px,460px)] items-center justify-center p-6 md:p-12 lg:p-20 overflow-hidden bg-gradient-to-br from-[#211d52] via-[#403592] to-[#7458b9]">
+      {/* Background ambient lighting */}
+      <div className="absolute top-[-240px] right-[20%] w-[500px] h-[500px] rounded-full bg-cyan-400/25 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-[-200px] left-[20%] w-[450px] h-[450px] rounded-full bg-pink-400/20 blur-3xl pointer-events-none" />
+
+      {/* Left visual column */}
+      <div className="hidden lg:flex flex-col justify-center relative max-w-xl text-white pr-8 select-none">
+        {/* Floating background decorative orbs */}
+        <div className="absolute top-4 right-12 w-48 h-48 rounded-full bg-gradient-to-br from-[#6cf5ff] via-[#8862ff] to-[#f767c3] shadow-[inset_12px_12px_24px_rgba(255,255,255,0.4),0_20px_40px_rgba(20,4,80,0.3)] animate-auth-float opacity-90 pointer-events-none" />
+        <div className="absolute bottom-6 right-36 w-24 h-24 rounded-full bg-gradient-to-br from-[#faacdd] via-[#f958ae] to-[#7c4eff] shadow-[inset_8px_8px_16px_rgba(255,255,255,0.4),0_15px_30px_rgba(20,4,80,0.3)] animate-auth-float [animation-delay:-2.4s] opacity-85 pointer-events-none" />
+        <div className="absolute bottom-28 right-4 w-16 h-16 rounded-full bg-gradient-to-br from-[#e7fbff] via-[#76d9ff] to-[#8b61ff] shadow-[inset_6px_6px_12px_rgba(255,255,255,0.4),0_10px_20px_rgba(20,4,80,0.25)] animate-auth-float [animation-delay:-4.2s] opacity-90 pointer-events-none" />
+
+        <div className="relative z-10">
+          <span className="inline-flex items-center mb-6 px-3 py-1.5 rounded-full border border-white/25 bg-white/10 text-xs font-bold uppercase tracking-wider text-white shadow-sm backdrop-blur-md">
+            ExpenseTracker
+          </span>
+          <h2 className="text-5xl xl:text-6xl font-extrabold tracking-tight leading-[1.05] drop-shadow-md">
+            Make every rupee<br />feel accounted for.
+          </h2>
+          <p className="mt-5 text-white/80 text-base max-w-sm leading-relaxed">
+            A focused, unified workspace for the projects, purchases, and financial decisions that matter.
+          </p>
+
+          {/* Mini preview card */}
+          <div className="mt-10 w-56 p-4 rounded-2xl border border-white/30 bg-white/15 backdrop-blur-xl shadow-2xl -rotate-3 transition-transform hover:rotate-0 duration-300">
+            <span className="block text-[10px] font-bold tracking-wider uppercase text-white/70">
+              Monthly overview
+            </span>
+            <strong className="block mt-1 text-2xl font-black text-white tracking-tight">
+              ₹24,800
+            </strong>
+            <div className="h-7 flex items-end gap-1 mt-3">
+              <span className="w-2.5 h-[35%] rounded-sm bg-white/75" />
+              <span className="w-2.5 h-[60%] rounded-sm bg-white/75" />
+              <span className="w-2.5 h-[45%] rounded-sm bg-white/75" />
+              <span className="w-2.5 h-[80%] rounded-sm bg-white/75" />
+              <span className="w-2.5 h-[65%] rounded-sm bg-white/75" />
+              <span className="w-2.5 h-[90%] rounded-sm bg-white/75" />
+              <span className="w-2.5 h-full rounded-sm bg-white" />
+            </div>
           </div>
         </div>
       </div>
-      <div className="auth-card animate-scale-in">
-        <div className="auth-brand">
-          <div className="auth-logo">💸</div>
-          <span className="auth-logo-text">ExpenseTracker</span>
+
+      {/* Right form card */}
+      <div className="relative z-10 w-full max-w-[440px] mx-auto rounded-3xl p-7 sm:p-9 border border-white/35 bg-white/15 backdrop-blur-2xl shadow-[0_24px_70px_rgba(20,5,70,0.3)] animate-scale-in">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center text-xl shadow-inner">
+            💸
+          </div>
+          <span className="text-xl font-bold text-white tracking-tight">
+            ExpenseTracker
+          </span>
         </div>
 
-        <div className="auth-heading">
-          <h1>{isLogin ? 'Welcome back' : 'Create your account'}</h1>
-          <p>
+        <div className="mb-6 text-left">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            {isLogin ? 'Welcome back' : 'Create your account'}
+          </h1>
+          <p className="text-sm text-white/75 mt-1.5 leading-relaxed">
             {isLogin
               ? 'Log in to pick up where you left off with your works.'
               : 'Sign up and start tracking your works and expenses.'}
           </p>
         </div>
 
-        {/* Segmented toggle — the single control that swaps between the two forms */}
-        <div className="auth-tabs" role="tablist" aria-label="Choose login or sign up">
+        {/* Mode switcher tabs */}
+        <div className="relative grid grid-cols-2 p-1 rounded-xl bg-[#1e125b]/25 border border-white/20 mb-6">
           <button
             type="button"
-            role="tab"
-            aria-selected={isLogin}
-            className={`auth-tab ${isLogin ? 'active' : ''}`}
+            className={`relative z-10 py-2 text-sm font-semibold rounded-lg transition-colors cursor-pointer ${
+              isLogin ? 'text-white' : 'text-white/60 hover:text-white'
+            }`}
             onClick={() => switchMode('login')}
           >
             Log in
           </button>
           <button
             type="button"
-            role="tab"
-            aria-selected={!isLogin}
-            className={`auth-tab ${!isLogin ? 'active' : ''}`}
+            className={`relative z-10 py-2 text-sm font-semibold rounded-lg transition-colors cursor-pointer ${
+              !isLogin ? 'text-white' : 'text-white/60 hover:text-white'
+            }`}
             onClick={() => switchMode('signup')}
           >
             Sign up
           </button>
-          <span className="auth-tab-indicator" data-mode={mode} aria-hidden="true" />
+          <div
+            className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white/20 border border-white/30 rounded-lg shadow-sm transition-transform duration-200 ${
+              isLogin ? 'left-1 translate-x-0' : 'left-1 translate-x-full'
+            }`}
+          />
         </div>
 
-        <form className="auth-form" onSubmit={handleSubmit} noValidate>
+        <form className="space-y-4" onSubmit={handleSubmit} noValidate>
           {!isLogin && (
-            <div className="form-group auth-field">
-              <label className="form-label" htmlFor="auth-fullname">Full name</label>
-              <div className="auth-input-wrap">
-                <span className="auth-ficon">{icons.user}</span>
+            <div className="space-y-1.5 text-left animate-fade-in">
+              <label className="block text-xs font-semibold text-white/90 tracking-wide" htmlFor="auth-fullname">
+                Full name
+              </label>
+              <div className="relative flex items-center">
+                <span className="absolute left-3.5 text-white/60 pointer-events-none">
+                  {icons.user}
+                </span>
                 <input
-                  className="form-input"
                   id="auth-fullname"
                   type="text"
                   autoComplete="name"
@@ -169,17 +203,21 @@ export default function AuthPage({ onAuthenticated }: { onAuthenticated: (user: 
                   value={fullName}
                   onChange={e => setFullName(e.target.value)}
                   autoFocus={!isLogin}
+                  className="w-full h-11 pl-10 pr-4 rounded-xl border border-white/25 bg-white/10 text-white placeholder-white/40 text-sm outline-none focus:border-white focus:ring-2 focus:ring-white/20 transition-all"
                 />
               </div>
             </div>
           )}
 
-          <div className="form-group auth-field">
-            <label className="form-label" htmlFor="auth-email">Email</label>
-            <div className="auth-input-wrap">
-              <span className="auth-ficon">{icons.mail}</span>
+          <div className="space-y-1.5 text-left">
+            <label className="block text-xs font-semibold text-white/90 tracking-wide" htmlFor="auth-email">
+              Email
+            </label>
+            <div className="relative flex items-center">
+              <span className="absolute left-3.5 text-white/60 pointer-events-none">
+                {icons.mail}
+              </span>
               <input
-                className="form-input"
                 id="auth-email"
                 type="email"
                 autoComplete="email"
@@ -187,26 +225,31 @@ export default function AuthPage({ onAuthenticated }: { onAuthenticated: (user: 
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 autoFocus={isLogin}
+                className="w-full h-11 pl-10 pr-4 rounded-xl border border-white/25 bg-white/10 text-white placeholder-white/40 text-sm outline-none focus:border-white focus:ring-2 focus:ring-white/20 transition-all"
               />
             </div>
           </div>
 
-          <div className="form-group auth-field">
-            <label className="form-label" htmlFor="auth-password">Password</label>
-            <div className="auth-input-wrap has-eye">
-              <span className="auth-ficon">{icons.lock}</span>
+          <div className="space-y-1.5 text-left">
+            <label className="block text-xs font-semibold text-white/90 tracking-wide" htmlFor="auth-password">
+              Password
+            </label>
+            <div className="relative flex items-center">
+              <span className="absolute left-3.5 text-white/60 pointer-events-none">
+                {icons.lock}
+              </span>
               <input
-                className="form-input"
                 id="auth-password"
                 type={showPassword ? 'text' : 'password'}
                 autoComplete={isLogin ? 'current-password' : 'new-password'}
                 placeholder={isLogin ? 'Your password' : 'At least 6 characters'}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
+                className="w-full h-11 pl-10 pr-11 rounded-xl border border-white/25 bg-white/10 text-white placeholder-white/40 text-sm outline-none focus:border-white focus:ring-2 focus:ring-white/20 transition-all"
               />
               <button
                 type="button"
-                className="auth-eye"
+                className="absolute right-2.5 p-1 text-white/60 hover:text-white rounded-lg transition-colors cursor-pointer"
                 onClick={() => setShowPassword(s => !s)}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                 tabIndex={-1}
@@ -217,50 +260,70 @@ export default function AuthPage({ onAuthenticated }: { onAuthenticated: (user: 
           </div>
 
           {!isLogin && (
-            <div className="form-group auth-field">
-              <label className="form-label" htmlFor="auth-confirm">Confirm password</label>
-              <div className="auth-input-wrap">
-                <span className="auth-ficon">{icons.lock}</span>
+            <div className="space-y-1.5 text-left animate-fade-in">
+              <label className="block text-xs font-semibold text-white/90 tracking-wide" htmlFor="auth-confirm">
+                Confirm password
+              </label>
+              <div className="relative flex items-center">
+                <span className="absolute left-3.5 text-white/60 pointer-events-none">
+                  {icons.lock}
+                </span>
                 <input
-                  className="form-input"
                   id="auth-confirm"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="new-password"
                   placeholder="Re-enter your password"
                   value={confirm}
                   onChange={e => setConfirm(e.target.value)}
+                  className="w-full h-11 pl-10 pr-4 rounded-xl border border-white/25 bg-white/10 text-white placeholder-white/40 text-sm outline-none focus:border-white focus:ring-2 focus:ring-white/20 transition-all"
                 />
               </div>
             </div>
           )}
 
           {error && (
-            <div className="auth-error" role="alert">
-              <span className="auth-error-icon">{icons.alert}</span>
-              {error}
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-900/40 border border-rose-300/30 text-rose-100 text-xs font-medium animate-fade-in" role="alert">
+              <span className="shrink-0">{icons.alert}</span>
+              <span>{error}</span>
             </div>
           )}
 
-          <button type="submit" className="btn btn-primary auth-submit" disabled={loading}>
-            {loading && <span className="auth-spinner" aria-hidden="true" />}
-            {loading
-              ? isLogin ? 'Logging in…' : 'Creating account…'
-              : isLogin ? 'Log in' : 'Create account'}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full h-12 mt-2 rounded-xl font-bold text-sm bg-white text-[#493b9a] hover:bg-[#f5f3ff] active:scale-[0.99] transition-all duration-150 flex items-center justify-center gap-2 shadow-lg shadow-black/10 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+          >
+            {loading && (
+              <span className="w-4 h-4 rounded-full border-2 border-[#493b9a]/30 border-t-[#493b9a] animate-spin" />
+            )}
+            <span>
+              {loading
+                ? isLogin ? 'Logging in…' : 'Creating account…'
+                : isLogin ? 'Log in' : 'Create account'}
+            </span>
           </button>
         </form>
 
-        <p className="auth-switch">
+        <p className="mt-6 text-xs text-white/70 text-center">
           {isLogin ? (
             <>
               Don&apos;t have an account?{' '}
-              <button type="button" className="auth-switch-btn" onClick={() => switchMode('signup')}>
+              <button
+                type="button"
+                className="font-bold text-white hover:underline cursor-pointer"
+                onClick={() => switchMode('signup')}
+              >
                 Sign up
               </button>
             </>
           ) : (
             <>
               Already have an account?{' '}
-              <button type="button" className="auth-switch-btn" onClick={() => switchMode('login')}>
+              <button
+                type="button"
+                className="font-bold text-white hover:underline cursor-pointer"
+                onClick={() => switchMode('login')}
+              >
                 Log in
               </button>
             </>

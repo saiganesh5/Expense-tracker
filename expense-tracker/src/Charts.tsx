@@ -86,7 +86,7 @@ function Donut({ segments, total, colors }: { segments: Slice[]; total: number; 
   const starts = segments.map((_, i) => fracs.slice(0, i).reduce((a, b) => a + b, 0) * c);
 
   return (
-    <svg className="viz-donut" width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label="Spending share by category">
+    <svg className="w-[184px] h-[184px]" width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} role="img" aria-label="Spending share by category">
       {/* track */}
       <circle cx={center} cy={center} r={r} fill="none" stroke="var(--viz-track)" strokeWidth={STROKE} />
       {segments.map((seg, i) => {
@@ -95,7 +95,7 @@ function Donut({ segments, total, colors }: { segments: Slice[]; total: number; 
         return (
           <circle
             key={seg.label}
-            className="viz-slice"
+            className="transition-[filter] duration-200 cursor-default hover:brightness-115"
             cx={center}
             cy={center}
             r={r}
@@ -142,17 +142,42 @@ export function WorkCharts({ work }: { work: Work }) {
       .sort((a, b) => b.value - a.value);
   }, [work.rows, groupCol, measureCol]);
 
+  function controls() {
+    return (
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="flex flex-col gap-1 text-[11px] font-semibold tracking-wider uppercase text-slate-400">
+          <span>Group by</span>
+          <select className="bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white min-w-[130px] focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors cursor-pointer" value={groupCol?.id ?? ''} onChange={e => setGroupId(e.target.value)} aria-label="Group spending by column">
+            {categoryCols.map(c => (
+              <option key={c.id} value={c.id} className="bg-[#18181f] text-white">{c.name}</option>
+            ))}
+          </select>
+        </label>
+        <label className="flex flex-col gap-1 text-[11px] font-semibold tracking-wider uppercase text-slate-400">
+          <span>Measure</span>
+          <select className="bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white min-w-[130px] focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-colors cursor-pointer" value={measureCol?.id ?? ''} onChange={e => setMeasureId(e.target.value)} aria-label="Amount column to sum">
+            {numericCols.map(c => (
+              <option key={c.id} value={c.id} className="bg-[#18181f] text-white">{c.name}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+    );
+  }
+
   // ---- Empty / guard states ----
   if (numericCols.length === 0 || categoryCols.length === 0) {
     return (
-      <div className="work-charts">
-        <div className="charts-head">
-          <h3 className="charts-title">{barIcon} Spending breakdown</h3>
+      <div className="bg-[#111116] border border-white/10 rounded-2xl p-5 sm:p-6 mb-6 shadow-xl animate-fade-in">
+        <div className="flex items-center justify-between flex-wrap gap-3 sm:gap-4 mb-4">
+          <h3 className="flex items-center gap-2 text-base font-semibold text-white">
+            <span className="text-violet-400">{barIcon}</span> Spending breakdown
+          </h3>
         </div>
-        <p className="charts-empty">
+        <p className="text-sm text-slate-400 py-2">
           {numericCols.length === 0
-            ? <>Add a <strong>Currency</strong> or <strong>Number</strong> column to chart where the money goes.</>
-            : <>Add a <strong>Text</strong> or <strong>Dropdown</strong> column (e.g. Category) to group your spending.</>}
+            ? <>Add a <strong className="text-white">Currency</strong> or <strong className="text-white">Number</strong> column to chart where the money goes.</>
+            : <>Add a <strong className="text-white">Text</strong> or <strong className="text-white">Dropdown</strong> column (e.g. Category) to group your spending.</>}
         </p>
       </div>
     );
@@ -163,12 +188,14 @@ export function WorkCharts({ work }: { work: Work }) {
 
   if (groups.length === 0 || positiveTotal <= 0) {
     return (
-      <div className="work-charts">
-        <div className="charts-head">
-          <h3 className="charts-title">{barIcon} Spending breakdown</h3>
+      <div className="bg-[#111116] border border-white/10 rounded-2xl p-5 sm:p-6 mb-6 shadow-xl animate-fade-in">
+        <div className="flex items-center justify-between flex-wrap gap-3 sm:gap-4 mb-4">
+          <h3 className="flex items-center gap-2 text-base font-semibold text-white">
+            <span className="text-violet-400">{barIcon}</span> Spending breakdown
+          </h3>
           {controls()}
         </div>
-        <p className="charts-empty">No amounts to chart yet — enter some values in <strong>{measureCol?.name}</strong> to see the breakdown.</p>
+        <p className="text-sm text-slate-400 py-2">No amounts to chart yet — enter some values in <strong className="text-white">{measureCol?.name}</strong> to see the breakdown.</p>
       </div>
     );
   }
@@ -199,74 +226,57 @@ export function WorkCharts({ work }: { work: Work }) {
   const donutColors = donutSegments.map((_, i) => (i < DONUT_TOP ? SERIES[i] : OTHER_COLOR));
   const donutTotal = donutSegments.reduce((s, g) => s + g.value, 0);
 
-  function controls() {
-    return (
-      <div className="charts-controls">
-        <label className="charts-control">
-          <span>Group by</span>
-          <select className="form-select" value={groupCol?.id ?? ''} onChange={e => setGroupId(e.target.value)} aria-label="Group spending by column">
-            {categoryCols.map(c => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
-        </label>
-        <label className="charts-control">
-          <span>Measure</span>
-          <select className="form-select" value={measureCol?.id ?? ''} onChange={e => setMeasureId(e.target.value)} aria-label="Amount column to sum">
-            {numericCols.map(c => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
-        </label>
-      </div>
-    );
-  }
-
   // ---- Single category: a chart would be a 1-bar chart / 1-slice pie (anti-pattern) ----
   if (groups.length === 1) {
     return (
-      <div className="work-charts">
-        <div className="charts-head">
-          <h3 className="charts-title">{barIcon} Spending breakdown</h3>
+      <div className="bg-[#111116] border border-white/10 rounded-2xl p-5 sm:p-6 mb-6 shadow-xl animate-fade-in">
+        <div className="flex items-center justify-between flex-wrap gap-3 sm:gap-4 mb-4">
+          <h3 className="flex items-center gap-2 text-base font-semibold text-white">
+            <span className="text-violet-400">{barIcon}</span> Spending breakdown
+          </h3>
           {controls()}
         </div>
-        <p className="charts-single">
-          All of your <strong>{measureCol?.name}</strong> so far is in{' '}
-          <strong>{highest.label}</strong> — {formatValue(measureCol, highest.value)}.
+        <p className="text-sm text-slate-300 py-2">
+          All of your <strong className="text-white">{measureCol?.name}</strong> so far is in{' '}
+          <strong className="text-white">{highest.label}</strong> — {formatValue(measureCol, highest.value)}.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="work-charts">
-      <div className="charts-head">
-        <h3 className="charts-title">{barIcon} Spending breakdown</h3>
+    <div className="bg-[#111116] border border-white/10 rounded-2xl p-5 sm:p-6 mb-6 shadow-xl animate-fade-in">
+      <div className="flex items-center justify-between flex-wrap gap-3 sm:gap-4 mb-4">
+        <h3 className="flex items-center gap-2 text-base font-semibold text-white">
+          <span className="text-violet-400">{barIcon}</span> Spending breakdown
+        </h3>
         {controls()}
       </div>
 
       {/* Plain-language answer to "where much / where low" */}
-      <p className="charts-insight">
-        Most on <span className="viz-key" style={{ background: SERIES[0] }} /> <strong>{highest.label}</strong>{' '}
+      <p className="flex items-center flex-wrap gap-2 text-xs sm:text-sm text-slate-300 bg-white/[0.03] border border-white/10 rounded-xl px-3.5 py-2.5 mb-5">
+        Most on <span className="inline-block w-2.5 h-2.5 rounded-xs shrink-0" style={{ background: SERIES[0] }} /> <strong className="text-white">{highest.label}</strong>{' '}
         ({formatValue(measureCol, highest.value)}, {formatPct(highest.value, positiveTotal)}) · least on{' '}
-        <span className="viz-key viz-key-muted" /> <strong>{lowest.label}</strong>{' '}
+        <span className="inline-block w-2.5 h-2.5 rounded-xs shrink-0 bg-[var(--viz-other)]" /> <strong className="text-white">{lowest.label}</strong>{' '}
         ({formatValue(measureCol, lowest.value)}, {formatPct(lowest.value, positiveTotal)}).
       </p>
 
-      <div className="charts-grid">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
         {/* Bar chart — ranked magnitude */}
-        <section className="chart-panel">
-          <h4 className="chart-subtitle">By {groupCol?.name} <span className="chart-subtitle-note">high → low</span></h4>
-          <div className="viz-bars">
+        <section className="min-w-0">
+          <h4 className="text-xs font-semibold text-slate-400 mb-3.5">
+            By {groupCol?.name} <span className="font-normal text-slate-500 ml-1.5">high → low</span>
+          </h4>
+          <div className="flex flex-col gap-2.5">
             {barGroups.map(g => {
               const w = Math.max((Math.abs(g.value) / barScaleMax) * 100, 1.5);
               return (
-                <div className="viz-bar-row" key={g.label} title={`${g.label}: ${formatValue(measureCol, g.value)} (${formatPct(g.value, positiveTotal)})`}>
-                  <span className="viz-bar-label" title={g.label}>{g.label}</span>
-                  <div className="viz-bar-track">
-                    <div className="viz-bar-fill" style={{ width: `${w}%` }} />
+                <div className="grid grid-cols-[minmax(80px,28%)_1fr_auto] items-center gap-3 group" key={g.label} title={`${g.label}: ${formatValue(measureCol, g.value)} (${formatPct(g.value, positiveTotal)})`}>
+                  <span className="text-xs text-slate-300 truncate" title={g.label}>{g.label}</span>
+                  <div className="relative h-4.5 flex items-center bg-white/[0.04] rounded overflow-hidden">
+                    <div className="h-full bg-[var(--viz-1)] rounded-r min-w-[3px] transition-all duration-300 group-hover:brightness-115" style={{ width: `${w}%` }} />
                   </div>
-                  <span className="viz-bar-value viz-num">{formatValue(measureCol, g.value)}</span>
+                  <span className="text-xs font-semibold text-white whitespace-nowrap font-mono tabular-nums">{formatValue(measureCol, g.value)}</span>
                 </div>
               );
             })}
@@ -275,23 +285,23 @@ export function WorkCharts({ work }: { work: Work }) {
 
         {/* Donut — part-to-whole */}
         {showDonut && (
-          <section className="chart-panel">
-            <h4 className="chart-subtitle">Share of {measureCol?.name}</h4>
-            <div className="viz-donut-wrap">
-              <div className="viz-donut-holder">
+          <section className="min-w-0">
+            <h4 className="text-xs font-semibold text-slate-400 mb-3.5">Share of {measureCol?.name}</h4>
+            <div className="flex items-center gap-5 flex-wrap">
+              <div className="relative w-[184px] h-[184px] shrink-0 mx-auto sm:mx-0">
                 <Donut segments={donutSegments} total={donutTotal} colors={donutColors} />
-                <div className="viz-donut-center">
-                  <span className="viz-donut-center-label">Total</span>
-                  <span className="viz-donut-center-value viz-num">{formatValue(measureCol, positiveTotal)}</span>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+                  <span className="text-[10px] tracking-widest uppercase text-slate-400 font-semibold">Total</span>
+                  <span className="text-base font-bold text-white font-mono tabular-nums">{formatValue(measureCol, positiveTotal)}</span>
                 </div>
               </div>
-              <ul className="viz-legend">
+              <ul className="list-none flex flex-col gap-1 flex-1 min-w-[160px]">
                 {donutSegments.map((seg, i) => (
-                  <li className="viz-legend-row" key={seg.label}>
-                    <span className="viz-legend-swatch" style={{ background: donutColors[i] }} />
-                    <span className="viz-legend-label">{seg.label}</span>
-                    <span className="viz-legend-value viz-num">{formatValue(measureCol, seg.value)}</span>
-                    <span className="viz-legend-pct viz-num">{formatPct(seg.value, donutTotal)}</span>
+                  <li className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-2.5 py-1 border-b border-white/5 last:border-b-0 text-xs" key={seg.label}>
+                    <span className="w-2.5 h-2.5 rounded-xs shrink-0" style={{ background: donutColors[i] }} />
+                    <span className="text-slate-300 truncate">{seg.label}</span>
+                    <span className="font-semibold text-white font-mono tabular-nums">{formatValue(measureCol, seg.value)}</span>
+                    <span className="text-[11px] text-slate-400 min-w-[2.5rem] text-right font-mono tabular-nums">{formatPct(seg.value, donutTotal)}</span>
                   </li>
                 ))}
               </ul>
@@ -301,31 +311,33 @@ export function WorkCharts({ work }: { work: Work }) {
       </div>
 
       {/* Table view — every category, exact numbers (the accessible twin) */}
-      <details className="charts-table-details">
-        <summary>Full breakdown ({groups.length} categories)</summary>
-        <div className="charts-table-wrap">
-          <table className="charts-table">
+      <details className="mt-6 border-t border-white/10 pt-2 group">
+        <summary className="cursor-pointer text-xs font-semibold text-slate-400 hover:text-white py-2 select-none transition-colors flex items-center gap-1.5">
+          <span className="inline-block transition-transform duration-200 group-open:rotate-90">▸</span> Full breakdown ({groups.length} categories)
+        </summary>
+        <div className="max-h-80 overflow-y-auto mt-2 rounded-lg border border-white/10">
+          <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr>
-                <th>{groupCol?.name}</th>
-                <th className="num">{measureCol?.name}</th>
-                <th className="num">Share</th>
+                <th className="sticky top-0 bg-[#16161d] text-slate-400 font-semibold text-[11px] tracking-wider uppercase px-3 py-2 border-b border-white/10">{groupCol?.name}</th>
+                <th className="sticky top-0 bg-[#16161d] text-slate-400 font-semibold text-[11px] tracking-wider uppercase px-3 py-2 border-b border-white/10 text-right font-mono tabular-nums">{measureCol?.name}</th>
+                <th className="sticky top-0 bg-[#16161d] text-slate-400 font-semibold text-[11px] tracking-wider uppercase px-3 py-2 border-b border-white/10 text-right font-mono tabular-nums">Share</th>
               </tr>
             </thead>
             <tbody>
               {groups.map(g => (
-                <tr key={g.label}>
-                  <td>{g.label}</td>
-                  <td className="num viz-num">{formatValue(measureCol, g.value)}</td>
-                  <td className="num viz-num">{formatPct(g.value, positiveTotal)}</td>
+                <tr key={g.label} className="hover:bg-white/[0.02]">
+                  <td className="px-3 py-2 border-b border-white/5 text-slate-200">{g.label}</td>
+                  <td className="px-3 py-2 border-b border-white/5 text-slate-200 text-right font-mono tabular-nums">{formatValue(measureCol, g.value)}</td>
+                  <td className="px-3 py-2 border-b border-white/5 text-slate-200 text-right font-mono tabular-nums">{formatPct(g.value, positiveTotal)}</td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
               <tr>
-                <td>Total</td>
-                <td className="num viz-num">{formatValue(measureCol, positiveTotal)}</td>
-                <td className="num viz-num">100%</td>
+                <td className="px-3 py-2 border-t border-white/10 font-bold text-white bg-white/[0.02]">Total</td>
+                <td className="px-3 py-2 border-t border-white/10 font-bold text-white bg-white/[0.02] text-right font-mono tabular-nums">{formatValue(measureCol, positiveTotal)}</td>
+                <td className="px-3 py-2 border-t border-white/10 font-bold text-white bg-white/[0.02] text-right font-mono tabular-nums">100%</td>
               </tr>
             </tfoot>
           </table>
