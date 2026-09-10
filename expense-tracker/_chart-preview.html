@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Charts preview</title>
+  <link rel="stylesheet" href="./src/index.css" />
+  <link rel="stylesheet" href="./src/App.css" />
+  <style> .preview-wrap { max-width: 1080px; margin: 0 auto; padding: 2rem; } </style>
+</head>
+<body>
+  <div class="preview-wrap">
+    <div class="work-charts">
+      <div class="charts-head">
+        <h3 class="charts-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+          Spending breakdown
+        </h3>
+        <div class="charts-controls">
+          <label class="charts-control"><span>Group by</span>
+            <select class="form-select"><option>Category</option></select></label>
+          <label class="charts-control"><span>Measure</span>
+            <select class="form-select"><option>Amount</option></select></label>
+        </div>
+      </div>
+
+      <p class="charts-insight">
+        Most on <span class="viz-key" style="background:var(--viz-1)"></span> <strong>Food</strong> (₹12,400, 38%) ·
+        least on <span class="viz-key viz-key-muted"></span> <strong>Misc</strong> (₹900, 3%).
+      </p>
+
+      <div class="charts-grid">
+        <section class="chart-panel">
+          <h4 class="chart-subtitle">By Category <span class="chart-subtitle-note">high → low</span></h4>
+          <div class="viz-bars">
+            <div class="viz-bar-row"><span class="viz-bar-label">Food</span><div class="viz-bar-track"><div class="viz-bar-fill" style="width:100%"></div></div><span class="viz-bar-value viz-num">₹12,400</span></div>
+            <div class="viz-bar-row"><span class="viz-bar-label">Travel</span><div class="viz-bar-track"><div class="viz-bar-fill" style="width:66.1%"></div></div><span class="viz-bar-value viz-num">₹8,200</span></div>
+            <div class="viz-bar-row"><span class="viz-bar-label">Rent</span><div class="viz-bar-track"><div class="viz-bar-fill" style="width:48.4%"></div></div><span class="viz-bar-value viz-num">₹6,000</span></div>
+            <div class="viz-bar-row"><span class="viz-bar-label">Supplies</span><div class="viz-bar-track"><div class="viz-bar-fill" style="width:25.8%"></div></div><span class="viz-bar-value viz-num">₹3,200</span></div>
+            <div class="viz-bar-row"><span class="viz-bar-label">Software</span><div class="viz-bar-track"><div class="viz-bar-fill" style="width:16.9%"></div></div><span class="viz-bar-value viz-num">₹2,100</span></div>
+            <div class="viz-bar-row"><span class="viz-bar-label">Misc</span><div class="viz-bar-track"><div class="viz-bar-fill" style="width:7.3%"></div></div><span class="viz-bar-value viz-num">₹900</span></div>
+          </div>
+        </section>
+
+        <section class="chart-panel">
+          <h4 class="chart-subtitle">Share of Amount</h4>
+          <div class="viz-donut-wrap">
+            <div class="viz-donut-holder">
+              <svg class="viz-donut" width="184" height="184" viewBox="0 0 184 184">
+                <circle cx="92" cy="92" r="79" fill="none" stroke="var(--viz-track)" stroke-width="26"/>
+                <circle class="viz-slice" cx="92" cy="92" r="79" fill="none" stroke="var(--viz-1)" stroke-width="26" stroke-dasharray="185.7 310.67" stroke-dashoffset="0" transform="rotate(-90 92 92)"/>
+                <circle class="viz-slice" cx="92" cy="92" r="79" fill="none" stroke="var(--viz-2)" stroke-width="26" stroke-dasharray="122.1 374.27" stroke-dashoffset="-187.7" transform="rotate(-90 92 92)"/>
+                <circle class="viz-slice" cx="92" cy="92" r="79" fill="none" stroke="var(--viz-3)" stroke-width="26" stroke-dasharray="88.8 407.57" stroke-dashoffset="-311.7" transform="rotate(-90 92 92)"/>
+                <circle class="viz-slice" cx="92" cy="92" r="79" fill="none" stroke="var(--viz-other)" stroke-width="26" stroke-dasharray="91.8 404.57" stroke-dashoffset="-402.5" transform="rotate(-90 92 92)"/>
+              </svg>
+              <div class="viz-donut-center">
+                <span class="viz-donut-center-label">Total</span>
+                <span class="viz-donut-center-value viz-num">₹32,800</span>
+              </div>
+            </div>
+            <ul class="viz-legend">
+              <li class="viz-legend-row"><span class="viz-legend-swatch" style="background:var(--viz-1)"></span><span class="viz-legend-label">Food</span><span class="viz-legend-value viz-num">₹12,400</span><span class="viz-legend-pct viz-num">38%</span></li>
+              <li class="viz-legend-row"><span class="viz-legend-swatch" style="background:var(--viz-2)"></span><span class="viz-legend-label">Travel</span><span class="viz-legend-value viz-num">₹8,200</span><span class="viz-legend-pct viz-num">25%</span></li>
+              <li class="viz-legend-row"><span class="viz-legend-swatch" style="background:var(--viz-3)"></span><span class="viz-legend-label">Rent</span><span class="viz-legend-value viz-num">₹6,000</span><span class="viz-legend-pct viz-num">18%</span></li>
+              <li class="viz-legend-row"><span class="viz-legend-swatch" style="background:var(--viz-other)"></span><span class="viz-legend-label">Other (3)</span><span class="viz-legend-value viz-num">₹6,200</span><span class="viz-legend-pct viz-num">19%</span></li>
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <details class="charts-table-details" open>
+        <summary>Full breakdown (6 categories)</summary>
+        <div class="charts-table-wrap">
+          <table class="charts-table">
+            <thead><tr><th>Category</th><th class="num">Amount</th><th class="num">Share</th></tr></thead>
+            <tbody>
+              <tr><td>Food</td><td class="num viz-num">₹12,400</td><td class="num viz-num">38%</td></tr>
+              <tr><td>Travel</td><td class="num viz-num">₹8,200</td><td class="num viz-num">25%</td></tr>
+              <tr><td>Rent</td><td class="num viz-num">₹6,000</td><td class="num viz-num">18%</td></tr>
+              <tr><td>Supplies</td><td class="num viz-num">₹3,200</td><td class="num viz-num">10%</td></tr>
+              <tr><td>Software</td><td class="num viz-num">₹2,100</td><td class="num viz-num">6%</td></tr>
+              <tr><td>Misc</td><td class="num viz-num">₹900</td><td class="num viz-num">3%</td></tr>
+            </tbody>
+            <tfoot><tr><td>Total</td><td class="num viz-num">₹32,800</td><td class="num viz-num">100%</td></tr></tfoot>
+          </table>
+        </div>
+      </details>
+    </div>
+  </div>
+</body>
+</html>
